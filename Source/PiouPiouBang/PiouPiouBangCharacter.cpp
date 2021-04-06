@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include <Kismet/GameplayStatics.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -148,6 +149,70 @@ void APiouPiouBangCharacter::OnFire()
 		{
 			if (bUsingMotionControllers)
 			{
+				//ignore, on a pas de motion control
+				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+				World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+			}
+			else
+			{
+				const FRotator SpawnRotation = GetControlRotation();
+				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+
+				//ray tracing
+				FHitResult* hit = new FHitResult;
+				ECollisionChannel* hi = new ECollisionChannel;//gnéh
+				if (World->LineTraceSingleByChannel(*hit, SpawnLocation, SpawnLocation + SpawnRotation.RotateVector(FVector::ForwardVector) * 10000, *hi)) {
+
+					//hit particle
+					UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit->Location, SpawnRotation, true);
+
+					//apply force
+					if (hit->GetActor()->IsRootComponentMovable()) {
+
+						UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit->GetActor()->GetRootComponent());
+
+						MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
+					}
+				}
+
+				//shoot particle
+				UGameplayStatics::SpawnEmitterAtLocation(World, shootParticle, SpawnLocation, SpawnRotation, true);
+			}
+		}
+	}
+
+	// try and play the sound if specified
+	if (FireSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != nullptr)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
+/*
+void APiouPiouBangCharacter::OnFire() //LancePatateEdition
+{
+	// try and fire a projectile
+	if (ProjectileClass != nullptr)
+	{
+		UWorld* const World = GetWorld();
+		if (World != nullptr)
+		{
+			if (bUsingMotionControllers)
+			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
 				World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
@@ -184,7 +249,7 @@ void APiouPiouBangCharacter::OnFire()
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-}
+}*/
 
 void APiouPiouBangCharacter::OnResetVR()
 {
