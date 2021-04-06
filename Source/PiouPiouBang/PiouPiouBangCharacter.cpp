@@ -12,6 +12,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include <Kismet/GameplayStatics.h>
+#include <DrawDebugHelpers.h>
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -162,19 +163,22 @@ void APiouPiouBangCharacter::OnFire()
 
 
 				//ray tracing
-				FHitResult* hit = new FHitResult;
-				ECollisionChannel* hi = new ECollisionChannel;//gnéh
-				if (World->LineTraceSingleByChannel(*hit, SpawnLocation, SpawnLocation + SpawnRotation.RotateVector(FVector::ForwardVector) * 10000, *hi)) {
+				FHitResult hit;
+
+				FVector oStartPosition = FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetForwardVector() * 100;
+				FVector oEndPosition = oStartPosition + FirstPersonCameraComponent->GetForwardVector() * 10000;
+
+				if (World->LineTraceSingleByChannel(hit, oStartPosition, oEndPosition, ECollisionChannel::ECC_Visibility )) 
+				{
 
 					//hit particle
-					UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit->Location, SpawnRotation, true);
+					UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit.Location, SpawnRotation, true);
 
 					//apply force
-					if (hit->GetActor()->IsRootComponentMovable()) {
+					if (hit.GetActor()->IsRootComponentMovable()) {
+						UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit.GetActor()->GetRootComponent());
 
-						UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit->GetActor()->GetRootComponent());
-
-						MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
+						if(MeshRootComp!=nullptr) MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
 					}
 				}
 
