@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	UAnimSequence* CactusRun;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UAnimSequence* CactusDeath;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,4 +41,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	bool GetBoolDespawn();
+
+	void Damage(int dmg);
+	void Death();
+
+private:
+	FTimerHandle DespawnTimer;
+	bool CBonTuPeDepop;
+
+	void Despawn();
 };

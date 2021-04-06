@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "PiouPiouBangGameMode.generated.h"
 
+class ACactus;
+
 UCLASS(minimalapi)
 class APiouPiouBangGameMode : public AGameModeBase
 {
@@ -13,6 +15,16 @@ class APiouPiouBangGameMode : public AGameModeBase
 
 public:
 	APiouPiouBangGameMode();
+
+	void AddCactus(ACactus* cactus);
+	void CactusSpawn(FVector position);
+	void SpawnUnCactus();
+
+	void Tick(float dt) override;
+
+private:
+	FTimerHandle SpawnTimer;
+	TArray<ACactus*> AllCactus;
 };
 
 

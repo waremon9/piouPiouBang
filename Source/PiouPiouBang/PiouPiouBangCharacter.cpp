@@ -14,6 +14,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <DrawDebugHelpers.h>
 
+#include "Cactus.h"
+
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
@@ -189,6 +191,11 @@ void APiouPiouBangCharacter::OnFire()
 
 							if (MeshRootComp != nullptr) MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
 						}
+
+						if (hit.GetActor()->GetName().Contains("BP_Cactus")) {
+							((ACactus*)hit.GetActor())->Damage(1);
+						}
+
 					}
 
 					//shoot particle
