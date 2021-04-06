@@ -64,7 +64,8 @@ public:
 	APiouPiouBangCharacter();
 
 protected:
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
+	void Tick(float dt) override;
 
 public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -95,10 +96,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint8 bUsingMotionControllers : 1;
 
+	/** Base cooldown for shooting gun*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	float BaseShootCooldown;
+
 protected:
 	
 	/** Fires a projectile. */
 	void OnFire();
+
+	/*reset cooldown*/
+	void ResetCooldown();
 
 	/** Resets HMD orientation and position in VR. */
 	void OnResetVR();
@@ -153,5 +161,7 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+private:
+	float ShootCooldown;
 };
 

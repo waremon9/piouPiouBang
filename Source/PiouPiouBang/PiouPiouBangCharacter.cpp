@@ -84,6 +84,8 @@ APiouPiouBangCharacter::APiouPiouBangCharacter()
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
+
+	ShootCooldown = 0;
 }
 
 void APiouPiouBangCharacter::BeginPlay()
@@ -109,6 +111,10 @@ void APiouPiouBangCharacter::BeginPlay()
 
 //////////////////////////////////////////////////////////////////////////
 // Input
+
+void APiouPiouBangCharacter::Tick(float dt) {
+	ShootCooldown -= dt;
+}
 
 void APiouPiouBangCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -142,68 +148,77 @@ void APiouPiouBangCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 
 void APiouPiouBangCharacter::OnFire()
 {
-	// try and fire a projectile
-	if (ProjectileClass != nullptr)
-	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
+	if (ShootCooldown <= 0) {
+		ResetCooldown();
+
+		// try and fire a projectile
+		if (ProjectileClass != nullptr)
 		{
-			if (bUsingMotionControllers)
+			UWorld* const World = GetWorld();
+			if (World != nullptr)
 			{
-				//ignore, on a pas de motion control
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-
-				//ray tracing
-				FHitResult hit;
-
-				FVector oStartPosition = FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetForwardVector() * 100;
-				FVector oEndPosition = oStartPosition + FirstPersonCameraComponent->GetForwardVector() * 10000;
-
-				if (World->LineTraceSingleByChannel(hit, oStartPosition, oEndPosition, ECollisionChannel::ECC_Visibility )) 
+				if (bUsingMotionControllers)
 				{
-
-					//hit particle
-					UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit.Location, SpawnRotation, true);
-
-					//apply force
-					if (hit.GetActor()->IsRootComponentMovable()) {
-						UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit.GetActor()->GetRootComponent());
-
-						if(MeshRootComp!=nullptr) MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
-					}
+					//ignore, on a pas de motion control
+					const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+					const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+					World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 				}
+				else
+				{
+					const FRotator SpawnRotation = GetControlRotation();
+					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+					const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-				//shoot particle
-				UGameplayStatics::SpawnEmitterAtLocation(World, shootParticle, SpawnLocation, SpawnRotation, true);
+
+					//ray tracing
+					FHitResult hit;
+
+					FVector oStartPosition = FirstPersonCameraComponent->GetComponentLocation() + FirstPersonCameraComponent->GetForwardVector() * 100;
+					FVector oEndPosition = oStartPosition + FirstPersonCameraComponent->GetForwardVector() * 10000;
+
+					if (World->LineTraceSingleByChannel(hit, oStartPosition, oEndPosition, ECollisionChannel::ECC_Visibility))
+					{
+
+						//hit particle
+						UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit.Location, SpawnRotation, true);
+
+						//apply force
+						if (hit.GetActor()->IsRootComponentMovable()) {
+							UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit.GetActor()->GetRootComponent());
+
+							if (MeshRootComp != nullptr) MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
+						}
+					}
+
+					//shoot particle
+					UGameplayStatics::SpawnEmitterAtLocation(World, shootParticle, SpawnLocation, SpawnRotation, true);
+				}
+			}
+		}
+
+		// try and play the sound if specified
+		if (FireSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
+		// try and play a firing animation if specified
+		if (FireAnimation != nullptr)
+		{
+			// Get the animation object for the arms mesh
+			UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+			if (AnimInstance != nullptr)
+			{
+				AnimInstance->Montage_Play(FireAnimation, 1.f);
 			}
 		}
 	}
+}
 
-	// try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != nullptr)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != nullptr)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
+void APiouPiouBangCharacter::ResetCooldown()
+{
+	ShootCooldown = BaseShootCooldown;
 }
 
 /*
