@@ -12,7 +12,7 @@ ACactus::ACactus()
 
 	CBonTuPeDepop = false;
 	WeshTMor = false;
-	Speed = 500;
+	Speed = 600;
 }
 
 // Called when the game starts or when spawned
@@ -39,13 +39,13 @@ bool ACactus::GetBoolDespawn()
 	return CBonTuPeDepop;
 }
 
-void ACactus::Damage(int dmg) {
+void ACactus::Damage(int dmg, FVector hitDirection) {
 	//pas de vie pour l'instant.
 	//instant death
-	Death();
+	Death(hitDirection);
 }
 
-void ACactus::Death() {
+void ACactus::Death(FVector hitDirection) {
 	/*if (CactusDeath != nullptr)
 	{
 		bool bLoop = false;
@@ -54,8 +54,12 @@ void ACactus::Death() {
 
 	MeshCactus->SetSimulatePhysics(true);
 
-	SetActorEnableCollision(false);
+	//SetActorEnableCollision(false);
+	MeshCactus->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
+	MeshCactus->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
 	WeshTMor = true;
+
+	MeshCactus->AddForce(hitDirection * 230000 * MeshCactus->GetMass());
 
 	GetWorld()->GetTimerManager().SetTimer(DespawnTimer, this, &ACactus::Despawn, 2.5, false);
 }
@@ -70,7 +74,6 @@ void ACactus::FollowPlayer(float dt)
 	float degree = radian * 180.f / PI - 90;
 
 	SetActorRotation(FRotator(0, degree, 0) );
-	UE_LOG(LogTemp, Log, TEXT("%f"), degree);
 
 	SetActorLocation(GetActorLocation() + GetActorRightVector() * Speed * dt);
 

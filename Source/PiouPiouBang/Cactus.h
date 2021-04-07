@@ -46,8 +46,8 @@ public:
 
 	bool GetBoolDespawn();
 
-	void Damage(int dmg);
-	void Death();
+	void Damage(int dmg, FVector hitDirection);
+	void Death(FVector hitDirection);
 
 	void FollowPlayer(float dt);
 

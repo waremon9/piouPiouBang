@@ -185,15 +185,17 @@ void APiouPiouBangCharacter::OnFire()
 						//hit particle
 						UGameplayStatics::SpawnEmitterAtLocation(World, hitParticle, hit.Location, SpawnRotation, true);
 
+						FVector Knockback = SpawnRotation.RotateVector(FVector::ForwardVector);
+
 						//apply force
 						if (hit.GetActor()->IsRootComponentMovable()) {
 							UStaticMeshComponent* MeshRootComp = Cast<UStaticMeshComponent>(hit.GetActor()->GetRootComponent());
 
-							if (MeshRootComp != nullptr) MeshRootComp->AddForce(SpawnRotation.RotateVector(FVector::ForwardVector) * 1000000 * MeshRootComp->GetMass());
+							if (MeshRootComp != nullptr) MeshRootComp->AddForce(Knockback * 400000 * MeshRootComp->GetMass());
 						}
 
 						if (hit.GetActor()->GetName().Contains("BP_Cactus")) {
-							((ACactus*)hit.GetActor())->Damage(1);
+							((ACactus*)hit.GetActor())->Damage(1, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.45));
 						}
 
 					}
