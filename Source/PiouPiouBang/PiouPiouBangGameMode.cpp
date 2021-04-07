@@ -9,6 +9,9 @@
 APiouPiouBangGameMode::APiouPiouBangGameMode()
 	: Super()
 {
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPersonCPP/Blueprints/FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -16,31 +19,32 @@ APiouPiouBangGameMode::APiouPiouBangGameMode()
 	// use our custom HUD class
 	HUDClass = APiouPiouBangHUD::StaticClass();
 
-	
-}
-
-//GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &APiouPiouBangGameMode::SpawnUnCactus, 4, true);
-
-void APiouPiouBangGameMode::AddCactus(ACactus* cactus)
-{
-	AllCactus.Add(cactus);
+	BaseSpawnCooldown = SpawnCooldown = 200000;
+	SpawnCooldown = 0;
+	static ConstructorHelpers::FObjectFinder<UClass> CactusClassFinder(TEXT("Blueprint'/Game/Ennemy/Cactus/Blueprint/BP_Cactus.BP_Cactus_C'"));
+	Cactus = CactusClassFinder.Object;
 }
 
 void APiouPiouBangGameMode::CactusSpawn(FVector position)
 {
-	GetWorld()->SpawnActor<ACactus>( position, FRotator::ZeroRotator);
-}
-
-void APiouPiouBangGameMode::SpawnUnCactus()
-{
-	FVector vect(0, 0, 50);
-	CactusSpawn(vect);
+	UE_LOG(LogTemp, Log, TEXT("Spawn"));
+	ACactus* cac = GetWorld()->SpawnActor<ACactus>(Cactus, position, FRotator::ZeroRotator);
+	AllCactus.Add(cac);
 }
 
 void APiouPiouBangGameMode::Tick(float dt)
 {
-	for (int i = AllCactus.GetSlack() - 1; i >= 0; i--) {
+	SpawnCooldown -= dt;
+	if (SpawnCooldown <= 0) {
+		CactusSpawn(FVector(0,0,170));
+		SpawnCooldown += BaseSpawnCooldown;
+	}
+
+	for (int i = AllCactus.Num() - 1; i >= 0; i--) {
 		ACactus* cac = AllCactus[i];
-		if (cac->GetBoolDespawn()) delete cac;
+		if (cac->GetBoolDespawn()) {
+			AllCactus.RemoveAt(i);
+			cac->Destroy();
+		}
 	}
 }

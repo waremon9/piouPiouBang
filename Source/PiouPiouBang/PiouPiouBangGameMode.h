@@ -13,18 +13,19 @@ class APiouPiouBangGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	TSubclassOf<ACactus> Cactus;
+
 public:
 	APiouPiouBangGameMode();
 
-	void AddCactus(ACactus* cactus);
 	void CactusSpawn(FVector position);
-	void SpawnUnCactus();
 
 	void Tick(float dt) override;
 
 private:
-	FTimerHandle SpawnTimer;
 	TArray<ACactus*> AllCactus;
+	float SpawnCooldown;
+	float BaseSpawnCooldown;
 };
 
 
