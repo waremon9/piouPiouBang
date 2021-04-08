@@ -26,6 +26,8 @@ APiouPiouBangCharacter::APiouPiouBangCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
+	GunSelected = true;
+
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -59,7 +61,6 @@ APiouPiouBangCharacter::APiouPiouBangCharacter()
 	FP_Gun_2->bCastDynamicShadow = false;
 	FP_Gun_2->CastShadow = false;
 	FP_Gun_2->SetupAttachment(RootComponent);
-	FP_Gun_2->SetVisibility(false);
 
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(FP_Gun);
@@ -78,7 +79,8 @@ void APiouPiouBangCharacter::BeginPlay()
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-
+	FP_Gun_2->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	FP_Gun_2->SetVisibility(false);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -101,7 +103,7 @@ void APiouPiouBangCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APiouPiouBangCharacter::OnFire);
 
 	// Bind switch weapon event
-	PlayerInputComponent->BindAction("Switch", IE_Pressed, this, &APiouPiouBangCharacter::OnFire);
+	PlayerInputComponent->BindAction("Switch", IE_Pressed, this, &APiouPiouBangCharacter::OnSwitch);
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -120,6 +122,19 @@ void APiouPiouBangCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 }
 
 void APiouPiouBangCharacter::OnFire()
+{
+	if (GunSelected)
+	{
+		OnFirePiouPiou();
+	}
+	else
+	{
+		OnFireBang();
+	}
+}
+
+
+void APiouPiouBangCharacter::OnFirePiouPiou()
 {
 	if (ShootCooldown <= 0) {
 		ResetCooldown();
@@ -186,13 +201,7 @@ void APiouPiouBangCharacter::OnFire()
 	}
 }
 
-void APiouPiouBangCharacter::ResetCooldown()
-{
-	ShootCooldown = BaseShootCooldown;
-}
-
-/*
-void APiouPiouBangCharacter::OnFire() //LancePatateEdition
+void APiouPiouBangCharacter::OnFireBang()
 {
 	// try and fire a projectile
 	if (ProjectileClass != nullptr)
@@ -200,25 +209,16 @@ void APiouPiouBangCharacter::OnFire() //LancePatateEdition
 		UWorld* const World = GetWorld();
 		if (World != nullptr)
 		{
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+			const FRotator SpawnRotation = GetControlRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-				// spawn the projectile at the muzzle
-				World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			}
+			// spawn the projectile at the muzzle
+			World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
 
@@ -238,7 +238,25 @@ void APiouPiouBangCharacter::OnFire() //LancePatateEdition
 			AnimInstance->Montage_Play(FireAnimation, 1.f);
 		}
 	}
-}*/
+}
+
+void APiouPiouBangCharacter::OnSwitch()
+{
+	if (GunSelected) {
+		FP_Gun->SetVisibility(false);
+		FP_Gun_2->SetVisibility(true);
+	}
+	else
+	{
+		FP_Gun->SetVisibility(true);
+		FP_Gun_2->SetVisibility(false);
+	}
+	GunSelected = !GunSelected;
+}
+void APiouPiouBangCharacter::ResetCooldown()
+{
+	ShootCooldown = BaseShootCooldown;
+}
 
 void APiouPiouBangCharacter::OnResetVR()
 {

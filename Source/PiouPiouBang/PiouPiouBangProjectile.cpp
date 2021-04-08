@@ -1,11 +1,16 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic; Games, Inc. All Rights Reserved.
 
 #include "PiouPiouBangProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include <Kismet/GameplayStatics.h>
+#include "Cactus.h"
 
 APiouPiouBangProjectile::APiouPiouBangProjectile() 
 {
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
@@ -34,10 +39,16 @@ APiouPiouBangProjectile::APiouPiouBangProjectile()
 void APiouPiouBangProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
+	if (OtherActor->GetName().Contains("BP_Cactus"))
 	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitParticle, GetActorLocation(), GetActorRotation(), true);
 
+		FRotator Rotation = (OtherActor->GetActorLocation() - GetActorLocation()).Rotation();
+		FVector Knockback = Rotation.RotateVector(FVector::ForwardVector);
+
+		((ACactus*)OtherActor)->Damage(1, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6)*5);
 		Destroy();
 	}
 }
+
+

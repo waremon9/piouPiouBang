@@ -22,6 +22,10 @@ class APiouPiouBangProjectile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
+	/**Hit Particle*/
+	UPROPERTY(EditDefaultsOnly, Category = Particle)
+	UParticleSystem* hitParticle;
+
 public:
 	APiouPiouBangProjectile();
 
@@ -33,5 +37,6 @@ public:
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
 };
 
