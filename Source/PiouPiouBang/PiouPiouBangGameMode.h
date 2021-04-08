@@ -24,12 +24,14 @@ class APiouPiouBangGameMode : public AGameModeBase
 public:
 	APiouPiouBangGameMode();
 
-	void CactusSpawn(FVector position);
+	void CactusSpawn();
 
+	void BeginPlay() override;
 	void Tick(float dt) override;
 
 private:
 	TArray<ACactus*> AllCactus;
+	TArray<AActor*> AllSpawnPoint;
 };
 
 

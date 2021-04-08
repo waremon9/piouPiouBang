@@ -5,6 +5,9 @@
 #include "PiouPiouBangCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Cactus.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
+#include "SpawnPoint.h"
+#include "Math/UnrealMathUtility.h"
 
 APiouPiouBangGameMode::APiouPiouBangGameMode()
 	: Super()
@@ -23,9 +26,13 @@ APiouPiouBangGameMode::APiouPiouBangGameMode()
 	Cactus = CactusClassFinder.Object;
 }
 
-void APiouPiouBangGameMode::CactusSpawn(FVector position)
+void APiouPiouBangGameMode::BeginPlay() {
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), AllSpawnPoint);
+}
+
+void APiouPiouBangGameMode::CactusSpawn()
 {
-	UE_LOG(LogTemp, Log, TEXT("Spawn"));
+	FVector position = AllSpawnPoint[FMath::RandRange(0, AllSpawnPoint.Num() - 1)]->GetActorLocation();
 	ACactus* cac = GetWorld()->SpawnActor<ACactus>(Cactus, position, FRotator::ZeroRotator);
 	AllCactus.Add(cac);
 }
@@ -34,7 +41,7 @@ void APiouPiouBangGameMode::Tick(float dt)
 {
 	SpawnCooldown -= dt;
 	if (SpawnCooldown <= 0) {
-		CactusSpawn(FVector(0,0,170));
+		CactusSpawn();
 		SpawnCooldown += BaseSpawnCooldown;
 	}
 
