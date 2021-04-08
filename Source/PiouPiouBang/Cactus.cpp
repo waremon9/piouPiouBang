@@ -12,25 +12,40 @@ ACactus::ACactus()
 
 	CBonTuPeDepop = false;
 	WeshTMor = false;
+	IsAttacking = false;
 }
 
 // Called when the game starts or when spawned
 void ACactus::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (CactusRun != nullptr)
-	{
-		bool bLoop = true;
-		MeshCactus->PlayAnimation(CactusRun, bLoop);
-	}
+	MeshCactus->PlayAnimation(CactusRun, true);
 }
 
 // Called every frame
 void ACactus::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(!WeshTMor) FollowPlayer(DeltaTime);
+	if (!WeshTMor) 
+	{
+		if (IsAttacking) {
+			if (!MeshCactus->IsPlaying()) {
+				IsAttacking = false;
+				MeshCactus->PlayAnimation(CactusRun, true);
+			}
+		}
+		else {
+			if (FVector::Distance(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), GetActorLocation()) < 150)
+			{
+				MeshCactus->PlayAnimation(CactusAttack, false);
+				IsAttacking = true;
+			}
+			else
+			{
+				FollowPlayer(DeltaTime);
+			}
+		}
+	}
 }
 
 bool ACactus::GetBoolDespawn()

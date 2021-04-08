@@ -55,6 +55,7 @@ private:
 	FTimerHandle DespawnTimer;
 	bool CBonTuPeDepop;
 	bool WeshTMor;
+	bool IsAttacking;
 
 	void Despawn();
 };
