@@ -15,8 +15,8 @@ class PIOUPIOUBANG_API ACactus : public AActor
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* MeshCactus;
 
-	/*UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	UCapsuleComponent* CollisionComp;*/
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+	float Speed;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -55,7 +55,6 @@ private:
 	FTimerHandle DespawnTimer;
 	bool CBonTuPeDepop;
 	bool WeshTMor;
-	float Speed;
 
 	void Despawn();
 };

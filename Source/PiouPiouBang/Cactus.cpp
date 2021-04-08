@@ -12,7 +12,6 @@ ACactus::ACactus()
 
 	CBonTuPeDepop = false;
 	WeshTMor = false;
-	Speed = 600;
 }
 
 // Called when the game starts or when spawned

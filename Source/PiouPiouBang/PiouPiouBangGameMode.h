@@ -15,6 +15,12 @@ class APiouPiouBangGameMode : public AGameModeBase
 
 	TSubclassOf<ACactus> Cactus;
 
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+	float SpawnCooldown;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+	float BaseSpawnCooldown;
+
 public:
 	APiouPiouBangGameMode();
 
@@ -24,8 +30,6 @@ public:
 
 private:
 	TArray<ACactus*> AllCactus;
-	float SpawnCooldown;
-	float BaseSpawnCooldown;
 };
 
 

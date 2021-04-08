@@ -19,8 +19,6 @@ APiouPiouBangGameMode::APiouPiouBangGameMode()
 	// use our custom HUD class
 	HUDClass = APiouPiouBangHUD::StaticClass();
 
-	BaseSpawnCooldown = SpawnCooldown = 2;
-	SpawnCooldown = 1;
 	static ConstructorHelpers::FObjectFinder<UClass> CactusClassFinder(TEXT("Blueprint'/Game/Ennemy/Cactus/Blueprint/BP_Cactus.BP_Cactus_C'"));
 	Cactus = CactusClassFinder.Object;
 }
