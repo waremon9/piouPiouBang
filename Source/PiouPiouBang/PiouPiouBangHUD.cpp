@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/Font.h"
 
+
 APiouPiouBangHUD::APiouPiouBangHUD()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -38,13 +39,13 @@ void APiouPiouBangHUD::DrawHUD()
 	FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem(TileItem);
-
-
-	FString Text = "COUCOU";
+	
+	FString Text = "SCORE : ";
+	Text.AppendInt(Score);
 	FLinearColor Color = FLinearColor::Red;
-	float x = 50;
-	float y = 50;
-	float Scale = 48;
+	float x = 15;
+	float y = 15;
+	float Scale = 2;
 	DrawText
 	(
 		Text,
@@ -53,6 +54,11 @@ void APiouPiouBangHUD::DrawHUD()
 		y,
 		Font,
 		Scale,
-		true
+		false
 	);
+}
+
+void APiouPiouBangHUD::SetScore(int score)
+{
+	Score = score;
 }

@@ -18,6 +18,7 @@ public:
 	/** Primary draw call for the HUD */
 	virtual void DrawHUD() override;
 
+	void SetScore(int score);
 
 private:
 	/** Crosshair asset pointer */
@@ -25,6 +26,6 @@ private:
 
 	class UFont* Font;
 
-	float Score;
+	int Score;
 };
 

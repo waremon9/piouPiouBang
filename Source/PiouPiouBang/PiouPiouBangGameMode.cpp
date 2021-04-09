@@ -57,11 +57,11 @@ void APiouPiouBangGameMode::Tick(float dt)
 void APiouPiouBangGameMode::AddScore(int score)
 {
 	Score += score;
+	APiouPiouBangHUD* hud = Cast<APiouPiouBangHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	hud->SetScore(Score);
 }
 
-int APiouPiouBangGameMode::GetScore() const {
-	return Score;
-}
+
 
 TArray<ACactus*>& APiouPiouBangGameMode::GetAllCactus()
 {

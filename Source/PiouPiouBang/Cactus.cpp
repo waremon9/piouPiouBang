@@ -2,6 +2,7 @@
 
 
 #include "Cactus.h"
+#include "PiouPiouBangGameMode.h"
 
 // Sets default values
 ACactus::ACactus()
@@ -60,11 +61,6 @@ void ACactus::Damage(int dmg, FVector hitDirection) {
 }
 
 void ACactus::Death(FVector hitDirection) {
-	/*if (CactusDeath != nullptr)
-	{
-		bool bLoop = false;
-		MeshCactus->PlayAnimation(CactusDeath, bLoop);
-	}*/
 
 	MeshCactus->SetSimulatePhysics(true);
 
@@ -76,6 +72,9 @@ void ACactus::Death(FVector hitDirection) {
 	MeshCactus->AddForce(hitDirection * 230000 * MeshCactus->GetMass());
 
 	GetWorld()->GetTimerManager().SetTimer(DespawnTimer, this, &ACactus::Despawn, 2.5, false);
+
+	APiouPiouBangGameMode* GameMode = (APiouPiouBangGameMode*)GetWorld()->GetAuthGameMode();
+	GameMode->AddScore(100);
 }
 
 void ACactus::FollowPlayer(float dt)

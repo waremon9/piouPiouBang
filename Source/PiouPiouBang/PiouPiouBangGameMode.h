@@ -30,7 +30,6 @@ public:
 	void Tick(float dt) override;
 
 	void AddScore(int score);
-	int GetScore() const;
 
 	TArray<ACactus*>& GetAllCactus();
 

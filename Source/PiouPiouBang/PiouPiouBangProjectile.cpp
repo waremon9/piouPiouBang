@@ -50,7 +50,6 @@ void APiouPiouBangProjectile::Tick(float dt) {
 }
 
 void APiouPiouBangProjectile::Explosion() {
-
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitParticle, GetActorLocation(), GetActorRotation(), true);
 
 	APiouPiouBangGameMode* GameMode = (APiouPiouBangGameMode*)GetWorld()->GetAuthGameMode();
@@ -65,7 +64,6 @@ void APiouPiouBangProjectile::Explosion() {
 			Knockback.Normalize();
 
 			cac->Damage(10, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6));
-			GameMode->AddScore(100);
 		}
 	}
 
