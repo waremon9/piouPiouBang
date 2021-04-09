@@ -54,6 +54,15 @@ void APiouPiouBangGameMode::Tick(float dt)
 	}
 }
 
+void APiouPiouBangGameMode::AddScore(int score)
+{
+	Score += score;
+}
+
+int APiouPiouBangGameMode::GetScore() const {
+	return Score;
+}
+
 TArray<ACactus*>& APiouPiouBangGameMode::GetAllCactus()
 {
 	return AllCactus;

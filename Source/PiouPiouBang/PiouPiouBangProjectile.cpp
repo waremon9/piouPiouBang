@@ -65,6 +65,7 @@ void APiouPiouBangProjectile::Explosion() {
 			Knockback.Normalize();
 
 			cac->Damage(10, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6));
+			GameMode->AddScore(100);
 		}
 	}
 
