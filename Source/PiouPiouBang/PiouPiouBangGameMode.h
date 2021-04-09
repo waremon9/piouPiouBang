@@ -29,6 +29,8 @@ public:
 	void BeginPlay() override;
 	void Tick(float dt) override;
 
+	TArray<ACactus*>& GetAllCactus();
+
 private:
 	TArray<ACactus*> AllCactus;
 	TArray<AActor*> AllSpawnPoint;

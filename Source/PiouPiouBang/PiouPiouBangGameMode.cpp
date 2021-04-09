@@ -53,3 +53,8 @@ void APiouPiouBangGameMode::Tick(float dt)
 		}
 	}
 }
+
+TArray<ACactus*>& APiouPiouBangGameMode::GetAllCactus()
+{
+	return AllCactus;
+}

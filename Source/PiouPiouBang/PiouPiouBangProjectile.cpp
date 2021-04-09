@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "Cactus.h"
+#include "PiouPiouBangGameMode.h"
 
 APiouPiouBangProjectile::APiouPiouBangProjectile() 
 {
@@ -31,9 +32,6 @@ APiouPiouBangProjectile::APiouPiouBangProjectile()
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
-
-	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
 }
 
 void APiouPiouBangProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -41,14 +39,34 @@ void APiouPiouBangProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	// Only add impulse and destroy projectile if we hit a physics
 	if (OtherActor->GetName().Contains("BP_Cactus"))
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitParticle, GetActorLocation(), GetActorRotation(), true);
-
-		FRotator Rotation = (OtherActor->GetActorLocation() - GetActorLocation()).Rotation();
-		FVector Knockback = Rotation.RotateVector(FVector::ForwardVector);
-
-		((ACactus*)OtherActor)->Damage(1, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6)*5);
-		Destroy();
+		Explosion();
 	}
 }
 
+void APiouPiouBangProjectile::Tick(float dt) {
+	BombTimer -= dt;
 
+	if (BombTimer<=0) Explosion();
+}
+
+void APiouPiouBangProjectile::Explosion() {
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), hitParticle, GetActorLocation(), GetActorRotation(), true);
+
+	APiouPiouBangGameMode* GameMode = (APiouPiouBangGameMode*)GetWorld()->GetAuthGameMode();
+	TArray<ACactus*> MesCactus = GameMode->GetAllCactus();
+
+	for (ACactus* cac : MesCactus) {
+		float Distance = FVector::Distance(cac->GetActorLocation(), GetActorLocation());
+		if ( Distance <= ExplosionRange) {
+
+			FRotator Rotation = (cac->GetActorLocation() - GetActorLocation()).Rotation();
+			FVector Knockback = Rotation.RotateVector(FVector::ForwardVector);
+			Knockback.Normalize();
+
+			cac->Damage(10, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6));
+		}
+	}
+
+	Destroy();
+}

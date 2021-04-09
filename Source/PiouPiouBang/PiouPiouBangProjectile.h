@@ -26,8 +26,18 @@ class APiouPiouBangProjectile : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = Particle)
 	UParticleSystem* hitParticle;
 
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		float BombTimer;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		float ExplosionRange;
+
 public:
 	APiouPiouBangProjectile();
+
+	void Tick(float dt) override;
+
+	void Explosion();
 
 	/** called when projectile hits something */
 	UFUNCTION()
