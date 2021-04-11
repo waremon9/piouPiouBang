@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PiouPiouBangCharacter.generated.h"
 
+class AGunPiouPiou;
+
 class UInputComponent;
 class USkeletalMeshComponent;
 class USceneComponent;
@@ -19,29 +21,12 @@ class APiouPiouBangCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	/**Shoot Particle*/
-	UPROPERTY(EditDefaultsOnly, Category = Particle)
-	UParticleSystem* shootParticle;
-
-	/**Hit Particle*/
-	UPROPERTY(EditDefaultsOnly, Category = Particle)
-	UParticleSystem* hitParticle;
+	TSubclassOf<AGunPiouPiou> GunPiouPiou;
+	AGunPiouPiou* PiouPiou;
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
-
-
-	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FP_Gun;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FP_Gun_2;
-
-	/** Location on gun mesh where projectiles should spawn. */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USceneComponent* FP_MuzzleLocation;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -83,24 +68,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint8 bUsingMotionControllers : 1;
 
-	/** Base cooldown for shooting gun*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	float BaseShootCooldown;
-
 protected:
 	
 	/** Fires a projectile. */
-	void OnFire();
-
-	void OnFirePiouPiou();
-
-	void OnFireBang();
-
-	/*reset cooldown*/
-	void ResetCooldown();
-
-	/** Resets HMD orientation and position in VR. */
-	void OnResetVR();
+	void OnFirePressed();
+	void OnFireReleased();
 
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
@@ -130,23 +102,12 @@ protected:
 		FVector Location;
 		bool bMoved;
 	};
-	void BeginTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
-	void EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
-	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
 	
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
-
-	/* 
-	 * Configures input for touchscreen devices if there is a valid touch interface for doing so 
-	 *
-	 * @param	InputComponent	The input component pointer to bind controls to
-	 * @returns true if touch controls were enabled.
-	 */
-	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -155,7 +116,7 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 private:
-	float ShootCooldown;
 	bool GunSelected;
+	bool Shooting;
 };
 

@@ -19,6 +19,7 @@ AGunPiouPiou::AGunPiouPiou()
 
 void AGunPiouPiou::Shoot()
 {
+	if (Cooldown > 0 || QteBullet <= 0) return;
 	Super::Shoot();
 
 	UWorld* const World = GetWorld();

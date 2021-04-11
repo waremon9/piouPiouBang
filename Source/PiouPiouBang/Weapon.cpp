@@ -12,7 +12,7 @@ AWeapon::AWeapon()
 	MeshWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshWeapon"));
 	MeshWeapon->bCastDynamicShadow = false;
 	MeshWeapon->CastShadow = false;
-	MeshWeapon->SetupAttachment(RootComponent);
+	SetRootComponent(MeshWeapon);
 
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(MeshWeapon);
@@ -43,8 +43,6 @@ void AWeapon::Tick(float DeltaTime)
 
 void AWeapon::Shoot()
 {
-	if (Cooldown > 0 || QteBullet <= 0) return;
-
 	QteBullet--;
 	ResetCooldown();
 }

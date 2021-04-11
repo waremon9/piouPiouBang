@@ -10,6 +10,7 @@ ACactus::ACactus()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	MeshCactus = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
+	SetRootComponent(MeshCactus);
 
 	CBonTuPeDepop = false;
 	WeshTMor = false;

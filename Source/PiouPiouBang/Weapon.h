@@ -58,7 +58,7 @@ public:
 
 	virtual void Shoot();
 
-private:
+protected:
 	float Cooldown;
 	float ReloadCooldown;
 };
