@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PiouPiouBangCharacter.h"
-#include "PiouPiouBangProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -17,6 +16,7 @@
 
 #include "Cactus.h"
 #include "GunPiouPiou.h"
+#include "GunBang.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -50,8 +50,11 @@ APiouPiouBangCharacter::APiouPiouBangCharacter()
 	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
 
 
-	static ConstructorHelpers::FObjectFinder<UClass> GunClassFinder(TEXT("Blueprint'/Game/Blueprints/MyGunPiouPiou.MyGunPiouPiou_C'"));
-	GunPiouPiou = GunClassFinder.Object;
+	static ConstructorHelpers::FObjectFinder<UClass> GunPiouPiouClassFinder(TEXT("Blueprint'/Game/Blueprints/MyGunPiouPiou.MyGunPiouPiou_C'"));
+	GunPiouPiou = GunPiouPiouClassFinder.Object;
+
+	static ConstructorHelpers::FObjectFinder<UClass> GunBangClassFinder(TEXT("Blueprint'/Game/Blueprints/MyGunBang.MyGunBang_C'"));
+	GunBang = GunBangClassFinder.Object;
 
 	GunOffset = FVector(80.0f, 20.0f, 100.0f);
 
@@ -65,6 +68,10 @@ void APiouPiouBangCharacter::BeginPlay()
 
 	PiouPiou = GetWorld()->SpawnActor<AGunPiouPiou>(GunPiouPiou, GetActorLocation(), FRotator::ZeroRotator);
 	PiouPiou->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+
+	Bang = GetWorld()->SpawnActor<AGunBang>(GunBang, GetActorLocation(), FRotator::ZeroRotator);
+	Bang->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	Bang->SetActorHiddenInGame(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -79,7 +86,7 @@ void APiouPiouBangCharacter::Tick(float dt) {
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("BangPan"));
+			Bang->Shoot();
 		}
 	}
 }
@@ -123,53 +130,16 @@ void APiouPiouBangCharacter::OnFireReleased()
 	Shooting = false;
 }
 
-/*void APiouPiouBangCharacter::OnFireBang()
-{
-	// try and fire a projectile
-	if (ProjectileClass != nullptr)
-	{
-		UWorld* const World = GetWorld();
-		if (World != nullptr)
-		{
-			const FRotator SpawnRotation = GetControlRotation();
-			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-			//Set Spawn Collision Handling Override
-			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-			// spawn the projectile at the muzzle
-			World->SpawnActor<APiouPiouBangProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-		}
-	}
-
-	// try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != nullptr)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != nullptr)
-		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
-		}
-	}
-}*/
-
 void APiouPiouBangCharacter::OnSwitch()
 {
 	if (GunSelected) {
-		UE_LOG(LogTemp, Log, TEXT("BangSwap"));
+		Bang->SetActorHiddenInGame(false);
+		PiouPiou->SetActorHiddenInGame(true);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("PiouPiouSwap"));
+		Bang->SetActorHiddenInGame(true);
+		PiouPiou->SetActorHiddenInGame(false);
 	}
 	GunSelected = !GunSelected;
 }

@@ -55,7 +55,7 @@ void AGunPiouPiou::Shoot()
 		}
 
 		if (hit.GetActor()->GetName().Contains("BP_Cactus")) {
-			((ACactus*)hit.GetActor())->Damage(1, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.45));
+			((ACactus*)hit.GetActor())->Damage(Damage, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.45));
 		}
 
 	}

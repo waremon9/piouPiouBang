@@ -26,12 +26,6 @@ class APiouPiouBangProjectile : public AActor
 	UPROPERTY(EditDefaultsOnly, Category = Particle)
 	UParticleSystem* hitParticle;
 
-	UPROPERTY(EditAnywhere, Category = Gameplay)
-		float BombTimer;
-
-	UPROPERTY(EditAnywhere, Category = Gameplay)
-		float ExplosionRange;
-
 public:
 	APiouPiouBangProjectile();
 
@@ -47,6 +41,15 @@ public:
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	void SetExplosionRange(float ER);
+	void SetBombTimer(float BT);
+	void SetDamage(float dmg);
+
+private:
+	float Damage;
+	float ExplosionRange;
+	float BombTimer;
 
 };
 

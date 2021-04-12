@@ -7,6 +7,7 @@
 #include "PiouPiouBangCharacter.generated.h"
 
 class AGunPiouPiou;
+class AGunBang;
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -22,7 +23,9 @@ class APiouPiouBangCharacter : public ACharacter
 	GENERATED_BODY()
 
 	TSubclassOf<AGunPiouPiou> GunPiouPiou;
+	TSubclassOf<AGunBang> GunBang;
 	AGunPiouPiou* PiouPiou;
+	AGunBang* Bang;
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -51,10 +54,6 @@ public:
 	/** Gun muzzle's offset from the characters location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector GunOffset;
-
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class APiouPiouBangProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)

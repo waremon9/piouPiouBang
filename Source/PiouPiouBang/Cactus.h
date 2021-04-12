@@ -16,7 +16,10 @@ class PIOUPIOUBANG_API ACactus : public AActor
 	USkeletalMeshComponent* MeshCactus;
 
 	UPROPERTY(EditAnywhere, Category = Gameplay)
-	float Speed;
+		float Speed;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		float Life;
 	
 public:	
 	// Sets default values for this actor's properties

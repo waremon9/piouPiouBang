@@ -14,9 +14,9 @@ class PIOUPIOUBANG_API AGunPiouPiou : public AWeapon
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = Particle)
+		UPROPERTY(EditDefaultsOnly, Category = Particle)
 		UParticleSystem* hitParticle;
-	
+
 public:
 	AGunPiouPiou();
 

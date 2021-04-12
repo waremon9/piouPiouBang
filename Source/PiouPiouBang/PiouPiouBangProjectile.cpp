@@ -43,6 +43,21 @@ void APiouPiouBangProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 	}
 }
 
+void APiouPiouBangProjectile::SetExplosionRange(float ER)
+{
+	ExplosionRange = ER;
+}
+
+void APiouPiouBangProjectile::SetBombTimer(float BT)
+{
+	BombTimer = BT;
+}
+
+void APiouPiouBangProjectile::SetDamage(float dmg)
+{
+	Damage = dmg;
+}
+
 void APiouPiouBangProjectile::Tick(float dt) {
 	BombTimer -= dt;
 
@@ -63,7 +78,7 @@ void APiouPiouBangProjectile::Explosion() {
 			FVector Knockback = Rotation.RotateVector(FVector::ForwardVector);
 			Knockback.Normalize();
 
-			cac->Damage(10, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6));
+			cac->Damage(Damage, FVector(Knockback.X, Knockback.Y, Knockback.Z + 0.6));
 		}
 	}
 

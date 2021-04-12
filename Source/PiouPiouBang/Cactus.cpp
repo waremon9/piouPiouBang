@@ -56,9 +56,12 @@ bool ACactus::GetBoolDespawn()
 }
 
 void ACactus::Damage(int dmg, FVector hitDirection) {
-	//pas de vie pour l'instant.
-	//instant death
-	Death(hitDirection);
+	Life -= dmg;
+	if (Life <= 0) {
+
+		Death(hitDirection);
+
+	}
 }
 
 void ACactus::Death(FVector hitDirection) {
