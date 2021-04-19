@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Cactus.generated.h"
+#include "Components/BoxComponent.h"
 
+#include "Cactus.generated.h"
 UCLASS()
 class PIOUPIOUBANG_API ACactus : public AActor
 {
 	GENERATED_BODY()
 
 	/** Mesh of cactus*/
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* MeshCactus;
+		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		USkeletalMeshComponent* MeshCactus;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = BoxCollision)
+		UBoxComponent* DamageCollision;
 
 	UPROPERTY(EditAnywhere, Category = Gameplay)
 		float Speed;
@@ -61,4 +65,7 @@ private:
 	bool IsAttacking;
 
 	void Despawn();
+	void Attack();
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

@@ -19,7 +19,13 @@ class APiouPiouBangGameMode : public AGameModeBase
 	float SpawnCooldown;
 
 	UPROPERTY(EditAnywhere, Category = Gameplay)
-	float BaseSpawnCooldown;
+		float BaseSpawnCooldown;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		int StartingEnnemieNumber;
+
+	UPROPERTY(EditAnywhere, Category = Gameplay)
+		int AdditionalEnnemieNumber;
 
 public:
 	APiouPiouBangGameMode();
@@ -28,6 +34,8 @@ public:
 
 	void BeginPlay() override;
 	void Tick(float dt) override;
+
+	void StartWave();
 
 	void AddScore(int score);
 
@@ -38,6 +46,9 @@ private:
 	TArray<AActor*> AllSpawnPoint;
 
 	float Score;
+	int VagueNumber;
+	int CactusToSpawn;
+	bool WaveEnded;
 };
 
 

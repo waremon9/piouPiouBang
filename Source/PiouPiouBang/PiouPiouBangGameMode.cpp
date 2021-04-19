@@ -24,10 +24,14 @@ APiouPiouBangGameMode::APiouPiouBangGameMode()
 
 	static ConstructorHelpers::FObjectFinder<UClass> CactusClassFinder(TEXT("Blueprint'/Game/Ennemy/Cactus/Blueprint/BP_Cactus.BP_Cactus_C'"));
 	Cactus = CactusClassFinder.Object;
+
+	VagueNumber = 0;
+	WaveEnded = true;
 }
 
 void APiouPiouBangGameMode::BeginPlay() {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnPoint::StaticClass(), AllSpawnPoint);
+	StartWave();
 }
 
 void APiouPiouBangGameMode::CactusSpawn()
@@ -39,19 +43,34 @@ void APiouPiouBangGameMode::CactusSpawn()
 
 void APiouPiouBangGameMode::Tick(float dt)
 {
-	SpawnCooldown -= dt;
-	if (SpawnCooldown <= 0) {
-		CactusSpawn();
-		SpawnCooldown += BaseSpawnCooldown;
+	if (WaveEnded) {
+		StartWave();
 	}
-
-	for (int i = AllCactus.Num() - 1; i >= 0; i--) {
-		ACactus* cac = AllCactus[i];
-		if (cac->GetBoolDespawn()) {
-			AllCactus.RemoveAt(i);
-			cac->Destroy();
+	else {
+		SpawnCooldown -= dt;
+		if (CactusToSpawn>0 && SpawnCooldown <= 0) {
+			CactusSpawn();
+			SpawnCooldown += BaseSpawnCooldown;
+			CactusToSpawn--;
 		}
+
+		for (int i = AllCactus.Num() - 1; i >= 0; i--) {
+			ACactus* cac = AllCactus[i];
+			if (cac->GetBoolDespawn()) {
+				AllCactus.RemoveAt(i);
+				cac->Destroy();
+			}
+		}
+
+		if (AllCactus.Num() == 0 && CactusToSpawn==0) WaveEnded = true;
 	}
+}
+
+void APiouPiouBangGameMode::StartWave() {
+	WaveEnded = false;
+	VagueNumber++;
+	CactusToSpawn = StartingEnnemieNumber + (VagueNumber-1) * AdditionalEnnemieNumber;
+	SpawnCooldown += BaseSpawnCooldown;
 }
 
 void APiouPiouBangGameMode::AddScore(int score)

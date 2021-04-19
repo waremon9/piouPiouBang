@@ -3,6 +3,7 @@
 
 #include "Cactus.h"
 #include "PiouPiouBangGameMode.h"
+#include "PiouPiouBangCharacter.h"
 
 // Sets default values
 ACactus::ACactus()
@@ -11,6 +12,11 @@ ACactus::ACactus()
 	PrimaryActorTick.bCanEverTick = true;
 	MeshCactus = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
 	SetRootComponent(MeshCactus);
+
+	DamageCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	DamageCollision->SetupAttachment(MeshCactus);
+	DamageCollision->SetRelativeLocation(FVector(0, 50, 90));
+
 
 	CBonTuPeDepop = false;
 	WeshTMor = false;
@@ -39,14 +45,27 @@ void ACactus::Tick(float DeltaTime)
 		else {
 			if (FVector::Distance(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation(), GetActorLocation()) < 150)
 			{
-				MeshCactus->PlayAnimation(CactusAttack, false);
-				IsAttacking = true;
+				Attack();
 			}
 			else
 			{
 				FollowPlayer(DeltaTime);
 			}
 		}
+	}
+}
+
+void ACactus::Attack() {
+	MeshCactus->PlayAnimation(CactusAttack, false);
+	IsAttacking = true;
+	
+	DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &ACactus::OnBeginOverlap);
+}
+
+void ACactus::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->GetName().Contains("FirstPersonCharacter")) {
+		((APiouPiouBangCharacter*)OtherActor)->GetHit(GetActorLocation());
 	}
 }
 

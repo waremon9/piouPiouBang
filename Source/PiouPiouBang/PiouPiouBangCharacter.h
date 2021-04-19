@@ -43,6 +43,12 @@ protected:
 	void Tick(float dt) override;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+		float InvincibilityFrame;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+		int Health;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -113,6 +119,8 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	void GetHit(FVector);
 
 private:
 	bool GunSelected;
