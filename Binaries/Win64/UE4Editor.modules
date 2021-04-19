@@ -2,6 +2,10 @@
 	"BuildId": "14830424",
 	"Modules": 
 	{
+<<<<<<< HEAD
 		"PiouPiouBang": "UE4Editor-PiouPiouBang.dll"
+=======
+		"PiouPiouBang": "UE4Editor-PiouPiouBang-9333.dll"
+>>>>>>> b67e7e38e46dc438b9ba540fd46f89d23bf025fd
 	}
 }

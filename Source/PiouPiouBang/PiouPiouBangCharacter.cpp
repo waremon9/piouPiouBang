@@ -120,6 +120,15 @@ void APiouPiouBangCharacter::SetupPlayerInputComponent(class UInputComponent* Pl
 	PlayerInputComponent->BindAxis("LookUpRate", this, &APiouPiouBangCharacter::LookUpAtRate);
 }
 
+void APiouPiouBangCharacter::GetHit(FVector HitLocation)
+{
+	Health--;
+	FVector KnockBack = GetActorLocation() - HitLocation;
+	KnockBack.Normalize();
+	KnockBack.Z = 0.5;
+	LaunchCharacter(KnockBack * 1000, false, false);
+}
+
 void APiouPiouBangCharacter::OnFirePressed()
 {
 	Shooting = true;
